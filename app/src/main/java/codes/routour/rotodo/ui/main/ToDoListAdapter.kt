@@ -19,7 +19,6 @@ class ToDoListAdapter : ListAdapter<ToDo, ToDoListAdapter.ToDoListViewHolder>(Di
         private val binding: TodoListItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ToDo?) {
-            Log.d("DEBUG", "binding item $item")
             binding.itemText.text = item?.text ?: ""
             binding.executePendingBindings()
         }
