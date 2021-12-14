@@ -7,12 +7,19 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import codes.routour.rotodo.R
 import codes.routour.rotodo.data.local.Database
-import codes.routour.rotodo.data.local.ToDoDatabase
 import codes.routour.rotodo.databinding.MainFragmentBinding
+import com.google.android.material.snackbar.Snackbar
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+
+import android.R.string.no
+
+
+
 
 class MainFragment : Fragment() {
     private var _binding: MainFragmentBinding? = null
@@ -20,6 +27,7 @@ class MainFragment : Fragment() {
     private val viewModel by viewModels<MainViewModel> {
         MainViewModelFactory(Database.getDb(requireContext().applicationContext))
     }
+    private lateinit var todoClickListener: TodoClickListener
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,9 +39,8 @@ class MainFragment : Fragment() {
         binding.lifecycleOwner = this
         Database.getDb(requireContext()).toDoDao()
 
+        setupTodoListAdapter(binding.todoListRecyclerView)
 
-        val adapter = ToDoListAdapter()
-        binding.todoListRecyclerView.adapter = adapter
 
         return binding.root
     }
@@ -43,6 +50,30 @@ class MainFragment : Fragment() {
         binding.addTodoFab.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_addToDoFragment)
         }
+    }
+
+    private fun setupTodoListAdapter(recyclerView: RecyclerView) {
+        val todoClickListener = TodoClickListener {todo, _ ->
+            Snackbar.make(
+                binding.root,
+                "Clicked on '${todo.text}' (id: ${todo.id})",
+                Snackbar.LENGTH_LONG
+            ).show()
+        }
+
+        val adapter = ToDoListAdapter(todoClickListener)
+
+        val swipeHandler = object : SwipeToDeleteCallback(requireContext()) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val todo = adapter.getItemAt(viewHolder.bindingAdapterPosition)
+                todo?.let {
+                    viewModel.deleteTodo(it)
+                }
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+        recyclerView.adapter = adapter
     }
 
     override fun onDestroyView() {

@@ -10,15 +10,12 @@ import codes.routour.rotodo.model.ToDo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.IllegalArgumentException
 
 class MainViewModel(private val datasource: ToDoDatabase) : ViewModel() {
     private val ioScope = Dispatchers.IO
     val todos: MutableLiveData<List<ToDo>> = MutableLiveData(mutableListOf())
     init {
         viewModelScope.launch {
-            Log.d("DEBUG", "Calling Db")
-
             // Seed Db if empty, then fetch data
             autoSeeding { withContext(ioScope) { loadToDos() } }
         }
@@ -31,7 +28,7 @@ class MainViewModel(private val datasource: ToDoDatabase) : ViewModel() {
                 datasource.toDoDao().insertAll(
                     ToDo("Faire des crêpes"),
                     ToDo("Demander de l'argent à Lucas"),
-                    ToDo("Eteindre le four"),
+                    ToDo("Éteindre le four"),
                 )
                 Log.d("DEBUG", "Seeded db")
                 dbToDos = datasource.toDoDao().getAll()
@@ -45,6 +42,15 @@ class MainViewModel(private val datasource: ToDoDatabase) : ViewModel() {
     private suspend fun loadToDos() {
         withContext(ioScope) {
             todos.postValue(datasource.toDoDao().getAll())
+        }
+    }
+
+    fun deleteTodo(todo: ToDo) {
+        viewModelScope.launch {
+            withContext(ioScope) {
+                datasource.toDoDao().delete(todo)
+                loadToDos()
+            }
         }
     }
 }

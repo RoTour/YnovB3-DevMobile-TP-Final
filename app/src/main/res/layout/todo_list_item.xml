@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools">
     <data>
-
+        <variable
+            name="todo"
+            type="codes.routour.rotodo.model.ToDo" />
+        <variable
+            name="viewHolder"
+            type="codes.routour.rotodo.ui.main.ToDoListAdapter.ToDoListViewHolder" />
+        <variable
+            name="clickListener"
+            type="codes.routour.rotodo.ui.main.TodoClickListener" />
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> clickListener.onClick(todo, viewHolder)}">
 
         <TextView
             android:id="@+id/item_text"
@@ -16,7 +24,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="Todo #1"
+            tools:text="Todo #1"
             android:textSize="20sp" />
     </LinearLayout>
 </layout>
