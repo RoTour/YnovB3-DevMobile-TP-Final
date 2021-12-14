@@ -7,51 +7,50 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import codes.routour.rotodo.data.local.ToDoDatabase
 import codes.routour.rotodo.model.ToDo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class MainViewModel(private val datasource: ToDoDatabase) : ViewModel() {
-    private val ioScope = Dispatchers.IO
+    private val viewModelJob = Job()
+    private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
     val todos: MutableLiveData<List<ToDo>> = MutableLiveData(mutableListOf())
+
     init {
-        viewModelScope.launch {
+        ioScope.launch {
             // Seed Db if empty, then fetch data
-            autoSeeding { withContext(ioScope) { loadToDos() } }
+            autoSeeding { loadToDos() }
         }
     }
 
     private suspend fun autoSeeding(callback: suspend () -> Unit) {
-        withContext(ioScope) {
-            var dbToDos = datasource.toDoDao().getAll()
-            if (dbToDos.isEmpty()) {
-                datasource.toDoDao().insertAll(
-                    ToDo("Faire des crêpes"),
-                    ToDo("Demander de l'argent à Lucas"),
-                    ToDo("Éteindre le four"),
-                )
-                Log.d("DEBUG", "Seeded db")
-                dbToDos = datasource.toDoDao().getAll()
-            }
-            Log.d("DEBUG", dbToDos.toString())
-            Log.d("DEBUG", "Done fetching from db")
+        var dbToDos = datasource.toDoDao().getAll()
+        if (dbToDos.isEmpty()) {
+            datasource.toDoDao().insertAll(
+                ToDo("Faire des crêpes"),
+                ToDo("Demander de l'argent à Lucas"),
+                ToDo("Éteindre le four"),
+            )
+            Log.d("DEBUG", "Seeded db")
+            dbToDos = datasource.toDoDao().getAll()
         }
+        Log.d("DEBUG", dbToDos.toString())
+        Log.d("DEBUG", "Done fetching from db")
         callback()
     }
 
     private suspend fun loadToDos() {
-        withContext(ioScope) {
-            todos.postValue(datasource.toDoDao().getAll())
-        }
+        todos.postValue(datasource.toDoDao().getAll())
     }
 
     fun deleteTodo(todo: ToDo) {
-        viewModelScope.launch {
-            withContext(ioScope) {
-                datasource.toDoDao().delete(todo)
-                loadToDos()
-            }
+        ioScope.launch {
+            datasource.toDoDao().delete(todo)
+            loadToDos()
         }
+    }
+
+    override fun onCleared() {
+        viewModelJob.cancel()
+        super.onCleared()
     }
 }
 

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">RoToDo</string>
     <string name="add_todo_button">Add Todo Button</string>
+    <string name="create_btn">CREATE</string>
+    <string name="createTodo_txt">Create your ToDo</string>
+    <string name="createTodoHint">Homeworks</string>
 </resources>
