@@ -1,24 +1,28 @@
 package codes.routour.rotodo.ui.main
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import codes.routour.rotodo.data.Repository
 import codes.routour.rotodo.data.local.ToDoDatabase
 import codes.routour.rotodo.model.ToDo
 import kotlinx.coroutines.*
 
-class MainViewModel(private val datasource: ToDoDatabase) : ViewModel() {
+class MainViewModel(
+    private val datasource: ToDoDatabase,
+    private val repository: Repository
+) : ViewModel() {
     private val viewModelJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
-    val todos: MutableLiveData<List<ToDo>> = MutableLiveData(mutableListOf())
+    val todos = repository.todos
 
     init {
         ioScope.launch {
             // Seed Db if empty, then fetch data
-            autoSeeding { loadToDos() }
+//            autoSeeding { loadToDos() }
+            repository.refresh(ioScope)
         }
+
     }
 
     private suspend fun autoSeeding(callback: suspend () -> Unit) {
@@ -38,7 +42,7 @@ class MainViewModel(private val datasource: ToDoDatabase) : ViewModel() {
     }
 
     private suspend fun loadToDos() {
-        todos.postValue(datasource.toDoDao().getAll())
+//        todos.postValue(datasource.toDoDao().getAll())
     }
 
     fun deleteTodo(todo: ToDo) {
@@ -55,12 +59,13 @@ class MainViewModel(private val datasource: ToDoDatabase) : ViewModel() {
 }
 
 class MainViewModelFactory(
-    private val datasource: ToDoDatabase
+    private val datasource: ToDoDatabase,
+    private val repository: Repository,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("unchecked_cast")
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(datasource) as T
+            return MainViewModel(datasource, repository) as T
         }
         throw IllegalArgumentException("Bad Argument in ListDisplayViewModelFactory. Hint: check in the associated fragment")
     }

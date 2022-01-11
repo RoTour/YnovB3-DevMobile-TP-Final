@@ -17,15 +17,19 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import android.R.string.no
-
-
+import codes.routour.rotodo.data.Repository
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class MainFragment : Fragment() {
     private var _binding: MainFragmentBinding? = null
     private val binding get() = _binding!!
     private val viewModel by viewModels<MainViewModel> {
-        MainViewModelFactory(Database.getDb(requireContext().applicationContext))
+        val ds = Database.getDb(requireContext().applicationContext);
+        MainViewModelFactory(
+            ds,
+            Repository(ds, FirebaseFirestore.getInstance())
+        )
     }
     private lateinit var todoClickListener: TodoClickListener
 

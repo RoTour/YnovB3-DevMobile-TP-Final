@@ -12,3 +12,14 @@ data class ToDo(
     @PrimaryKey(autoGenerate = true)
     var id: Long? = null
 )
+
+fun ToDo.toHashMap(): HashMap<String, String> {
+    return hashMapOf(
+        "text" to this.text,
+        "id" to this.id.toString(),
+    )
+}
+
+fun Map<String, Any>.toToDo(): ToDo {
+    return ToDo(this["text"] as String, this["id"] as Long)
+}
