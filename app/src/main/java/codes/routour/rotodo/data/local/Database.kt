@@ -4,9 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import codes.routour.rotodo.data.local.migrations.MIGRATION_1_2
 import codes.routour.rotodo.model.ToDo
 
-@Database(entities = [ToDo::class], version = 1)
+@Database(entities = [ToDo::class], version = 2)
 abstract class ToDoDatabase: RoomDatabase() {
     abstract fun toDoDao(): ToDoDao
 }
@@ -19,7 +20,9 @@ object Database {
             db = Room
                 .databaseBuilder(
                     context, ToDoDatabase::class.java, "tp-sqlite"
-                ).build()
+                )
+                .addMigrations(MIGRATION_1_2)
+                .build()
         }
         return db!!
     }

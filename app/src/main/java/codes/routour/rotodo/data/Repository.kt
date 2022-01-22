@@ -9,60 +9,57 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+// Could make a datasource interface to allow dependencies injection (for Testing)
+// Server is the main source of trust
 class Repository(
-    private val datasource: ToDoDatabase,
-    private val fb: FirebaseFirestore,
+    private val localDS: ToDoDatabase,
+    private val remoteDS: FirebaseFirestore,
 ) {
 
     val todos: MutableLiveData<List<ToDo>> = MutableLiveData(mutableListOf())
 
     suspend fun refresh(ioScope: CoroutineScope) {
-        val local = datasource.toDoDao().getAll()
-        todos.postValue(local.sortedBy { filter -> filter.id })
-        mergeLocalAndRemote(local, ioScope)
+        val local = localDS.toDoDao().getAll()
+        todos.postValue(local.sortedBy { filter -> filter.updatedAt })
+        updateFromRemote(ioScope)
     }
 
-    private suspend fun mergeLocalAndRemote(
-        local: List<ToDo>,
+    private suspend fun updateFromRemote(
         ioScope: CoroutineScope,
     ) {
-        fb.collection("todos")
+        remoteDS.collection("todos")
             .get()
-            .addOnSuccessListener {
-                var fbTodos = it.documents.map { doc ->
+            .addOnSuccessListener { query ->
+                val fbTodos = query.documents.map { doc ->
                     doc.data?.toToDo() ?: ToDo("")
-                }
-                fbTodos = fbTodos.filter { todo ->
-                    todo.text != ""
-                }
-                val filteredToDos = (fbTodos + local).distinctBy { filter -> filter.id }
+                }.filter { it.text != "" }
+                todos.value = fbTodos
 
-                Log.d("DEBUG", local.toString())
-                Log.d("DEBUG", fbTodos.toString())
-                Log.d("DEBUG", filteredToDos.toString())
-                todos.value = filteredToDos.sortedBy { filter -> filter.id }
                 ioScope.launch {
-                    datasource.toDoDao().insertAll(*filteredToDos.toTypedArray())
+                    localDS.toDoDao().deleteAll()
+                    localDS.toDoDao().insertAll(*fbTodos.toTypedArray())
                 }
             }
     }
 
-    fun getFromServer() {
-        Log.d("DEBUG", "Should add todo to firestore")
-        fb.collection("todos")
-            .get()
+    fun uploadToRemote(vararg todos: ToDo, next: () -> Unit) {
+        todos.forEach { todo ->
+            Log.d("DEBUG", "$todo")
+            remoteDS.collection("todos").document(todo.id.toString())
+                .set(todo)
+                .addOnSuccessListener {
+                    Log.d("DEBUG", "Uploaded: ${todo.text}")
+                    next()
+                }
+        }
+    }
+
+    suspend fun deleteToDo(todo: ToDo, ioScope: CoroutineScope) {
+        localDS.toDoDao().delete(todo)
+        remoteDS.collection("todos").document(todo.id.toString())
+            .delete()
             .addOnSuccessListener {
-                Log.d("DEBUG", "Firestore fetch Success")
-                for (doc in it) {
-                    Log.d("DEBUG", doc.data.toString())
-                }
-                var fbTodos = it.documents.map { doc ->
-                    doc.data?.toToDo() ?: ToDo("")
-                }
-                fbTodos = fbTodos.filter { todo ->
-                    todo.text != ""
-                }
-                todos.value = fbTodos
+                ioScope.launch { refresh(ioScope) }
             }
     }
 }

@@ -11,16 +11,19 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import codes.routour.rotodo.R
+import codes.routour.rotodo.data.Repository
 import codes.routour.rotodo.data.local.Database
 import codes.routour.rotodo.databinding.AddToDoFragmentBinding
 import codes.routour.rotodo.ui.main.MainViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.FirebaseFirestore
 
 class AddToDoFragment : Fragment() {
     private var _binding: AddToDoFragmentBinding? = null
     private val binding get() = _binding!!
     private val viewModel by viewModels<AddToDoViewModel> {
-        AddToDoViewModelFactory(Database.getDb(requireContext().applicationContext))
+        val db = Database.getDb(requireContext().applicationContext)
+        AddToDoViewModelFactory(Repository(db, FirebaseFirestore.getInstance()))
     }
 
     override fun onCreateView(

@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import codes.routour.rotodo.data.Repository
 import codes.routour.rotodo.data.local.ToDoDatabase
 import codes.routour.rotodo.model.ToDo
 import codes.routour.rotodo.ui.main.MainViewModel
@@ -11,7 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 
 class AddToDoViewModel(
-    private val datasource: ToDoDatabase
+    private val repository: Repository
 ) : ViewModel() {
     private val viewModelJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
@@ -24,8 +25,9 @@ class AddToDoViewModel(
             return
         }
         ioScope.launch {
-            datasource.toDoDao().insert(ToDo(todoTxt))
-            eventTodoInserted.postValue(true)
+            repository.uploadToRemote(ToDo(todoTxt)) {
+                eventTodoInserted.postValue(true)
+            }
         }
     }
 
@@ -36,12 +38,12 @@ class AddToDoViewModel(
 }
 
 class AddToDoViewModelFactory(
-    private val datasource: ToDoDatabase
+    private val repository: Repository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("unchecked_cast")
         if (modelClass.isAssignableFrom(AddToDoViewModel::class.java)) {
-            return AddToDoViewModel(datasource) as T
+            return AddToDoViewModel(repository) as T
         }
         throw IllegalArgumentException("Bad Argument in ListDisplayViewModelFactory. Hint: check in the associated fragment")
     }

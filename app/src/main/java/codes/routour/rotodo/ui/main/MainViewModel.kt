@@ -41,14 +41,9 @@ class MainViewModel(
         callback()
     }
 
-    private suspend fun loadToDos() {
-//        todos.postValue(datasource.toDoDao().getAll())
-    }
-
     fun deleteTodo(todo: ToDo) {
         ioScope.launch {
-            datasource.toDoDao().delete(todo)
-            loadToDos()
+            repository.deleteToDo(todo, ioScope)
         }
     }
 
