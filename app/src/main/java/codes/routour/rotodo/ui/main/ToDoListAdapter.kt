@@ -25,7 +25,6 @@ class ToDoListAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ToDo?, clickListener: TodoClickListener) {
             item?.let {
-                binding.itemText.text = item.text
                 binding.todo = item
             }
             binding.clickListener = clickListener

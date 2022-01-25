@@ -62,15 +62,13 @@ class MainFragment : Fragment() {
         val todoClickListener = TodoClickListener { todo, viewHolder, adapter ->
             Snackbar.make(
                 binding.root,
-                "Clicked on '${todo.text}' (status: ${todo.completed})",
+                "Clicked on '${todo.text}' (status: ${!todo.completed})",
                 Snackbar.LENGTH_LONG
             ).show()
-            Log.d("DEBUG", "before toggle: $todo")
             viewModel.todos.value
                 ?.get(viewHolder.absoluteAdapterPosition)
                 ?.completed = viewModel.toggleCompleted(todo)
             adapter.notifyItemChanged(viewHolder.layoutPosition)
-            Log.d("DEBUG", "after toggle: $todo")
         }
 
         val adapter = ToDoListAdapter(todoClickListener)
