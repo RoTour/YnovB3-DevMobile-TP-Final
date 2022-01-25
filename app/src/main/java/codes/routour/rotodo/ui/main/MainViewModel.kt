@@ -22,7 +22,6 @@ class MainViewModel(
 //            autoSeeding { loadToDos() }
             repository.refresh(ioScope)
         }
-
     }
 
     private suspend fun autoSeeding(callback: suspend () -> Unit) {
@@ -30,7 +29,7 @@ class MainViewModel(
         if (dbToDos.isEmpty()) {
             datasource.toDoDao().insertAll(
                 ToDo("Faire des crêpes"),
-                ToDo("Demander de l'argent à Lucas"),
+                ToDo("Manger des cookies"),
                 ToDo("Éteindre le four"),
             )
             Log.d("DEBUG", "Seeded db")
@@ -45,6 +44,15 @@ class MainViewModel(
         ioScope.launch {
             repository.deleteToDo(todo, ioScope)
         }
+    }
+
+    fun toggleCompleted(todo: ToDo): Boolean {
+        todo.completed = !todo.completed
+        ioScope.launch {
+            repository.uploadToRemote(todo)
+            repository.updateLocal(todo, ioScope)
+        }
+        return todo.completed
     }
 
     override fun onCleared() {

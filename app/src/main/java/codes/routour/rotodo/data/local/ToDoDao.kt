@@ -14,6 +14,9 @@ interface ToDoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg todo: ToDo)
 
+    @Update
+    fun update(vararg todo: ToDo)
+
     @Delete
     fun delete(todo: ToDo)
 

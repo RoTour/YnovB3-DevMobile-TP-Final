@@ -2,7 +2,6 @@ package codes.routour.rotodo.ui.main
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -20,6 +19,7 @@ class ToDoListAdapter(
     fun getItemAt(position: Int): ToDo? {
         return getItem(position)
     }
+
     class ToDoListViewHolder(
         private val binding: TodoListItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -30,12 +30,16 @@ class ToDoListAdapter(
             }
             binding.clickListener = clickListener
             binding.viewHolder = this
-            binding.executePendingBindings()
+            binding.adapter = (bindingAdapter as ToDoListAdapter?)!!
+
             // Fixing a bug in the RecyclerView lib where items layout params are forced
             // to be wrap_content
             itemView.layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             )
+            Log.d("DEBUG", "called bind function")
+            binding.hasPendingBindings()
+            binding.executePendingBindings()
         }
 
     }
@@ -57,8 +61,11 @@ class ToDoListAdapter(
 
 class TodoClickListener(
     private val clickListener:
-        ((task: ToDo, viewHolder: ToDoListAdapter.ToDoListViewHolder) -> Unit)
+    ((task: ToDo, viewHolder: ToDoListAdapter.ToDoListViewHolder, adapter: ToDoListAdapter) -> Unit)
 ) {
-    fun onClick(task: ToDo, viewHolder: ToDoListAdapter.ToDoListViewHolder) =
-        clickListener(task, viewHolder)
+    fun onClick(
+        task: ToDo,
+        viewHolder: ToDoListAdapter.ToDoListViewHolder,
+        adapter: ToDoListAdapter
+    ) = clickListener(task, viewHolder, adapter)
 }

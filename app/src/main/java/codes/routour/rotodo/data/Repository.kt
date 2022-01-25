@@ -1,6 +1,5 @@
 package codes.routour.rotodo.data
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import codes.routour.rotodo.data.local.ToDoDatabase
 import codes.routour.rotodo.model.ToDo
@@ -42,14 +41,12 @@ class Repository(
             }
     }
 
-    fun uploadToRemote(vararg todos: ToDo, next: () -> Unit) {
+    fun uploadToRemote(vararg todos: ToDo, next: (() -> Unit)? = null) {
         todos.forEach { todo ->
-            Log.d("DEBUG", "$todo")
             remoteDS.collection("todos").document(todo.id.toString())
                 .set(todo)
                 .addOnSuccessListener {
-                    Log.d("DEBUG", "Uploaded: ${todo.text}")
-                    next()
+                    next?.let { it() }
                 }
         }
     }
@@ -61,5 +58,11 @@ class Repository(
             .addOnSuccessListener {
                 ioScope.launch { refresh(ioScope) }
             }
+    }
+
+    fun updateLocal(todo: ToDo, scope: CoroutineScope) {
+        scope.launch {
+            localDS.toDoDao().update(todo)
+        }
     }
 }

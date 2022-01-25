@@ -15,7 +15,10 @@ data class ToDo(
     var updatedAt: Long = System.currentTimeMillis(),
 
     @PrimaryKey(autoGenerate = true)
-    var id: Long? = UUID.randomUUID().leastSignificantBits
+    var id: Long? = UUID.randomUUID().leastSignificantBits,
+
+    @ColumnInfo(name = "completed", defaultValue = "0")
+    var completed: Boolean = false
 )
 
 fun ToDo.toHashMap(): HashMap<String, String> {
@@ -27,5 +30,10 @@ fun ToDo.toHashMap(): HashMap<String, String> {
 }
 
 fun Map<String, Any>.toToDo(): ToDo {
-    return ToDo(this["text"] as String, this["updatedAt"] as Long, this["id"] as Long)
+    return ToDo(
+        this["text"] as String,
+        this["updatedAt"] as Long,
+        this["id"] as Long,
+        (this["completed"] ?: false) as Boolean
+    )
 }
