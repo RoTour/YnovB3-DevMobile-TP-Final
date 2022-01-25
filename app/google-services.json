@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "841235357600",
+    "project_id": "rotodo-8b2ce",
+    "storage_bucket": "rotodo-8b2ce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841235357600:android:3c16725811f4a431f44ec5",
+        "android_client_info": {
+          "package_name": "codes.routour.rotodo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "841235357600-c593hi488j78ehagg4467h10gvim7aav.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdDtxBABQsUgJhO-8r3S6elyo6Q9GAdgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "841235357600-c593hi488j78ehagg4467h10gvim7aav.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
