@@ -14,3 +14,4 @@ Fonctionnalités:
 - Utilisation du databinding, fonctionnalité recommandée par google pour la liaison entre les
   layouts html et la logique
 - Icon d'application custom
+- Gestion du Up Button  (dans MainActivity.kt)
