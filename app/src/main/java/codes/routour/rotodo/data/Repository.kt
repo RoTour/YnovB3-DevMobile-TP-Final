@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 // Could make a datasource interface to allow dependencies injection (for Testing)
-// Server is the main source of trust
+// The Remote DS is the main source of trust
 class Repository(
     private val localDS: ToDoDatabase,
     private val remoteDS: FirebaseFirestore,
@@ -29,12 +29,15 @@ class Repository(
         remoteDS.collection("todos")
             .get()
             .addOnSuccessListener { query ->
-                val fbTodos = query.documents.map { doc ->
-                    doc.data?.toToDo() ?: ToDo("")
-                }.filter { it.text != "" }
-                todos.value = fbTodos
+                val fbTodos = query.documents
+                    .map { doc -> doc.data?.toToDo() ?: ToDo("") }
+                    .filter { it.text != "" }
+                    .sortedBy { filter -> filter.updatedAt }
 
+                todos.value = fbTodos
                 ioScope.launch {
+                    // Update all the cache
+                    // Avoid pb of cache remaining in storage for too long
                     localDS.toDoDao().deleteAll()
                     localDS.toDoDao().insertAll(*fbTodos.toTypedArray())
                 }
