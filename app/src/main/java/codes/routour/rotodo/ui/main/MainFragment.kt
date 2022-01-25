@@ -40,9 +40,13 @@ class MainFragment : Fragment() {
         Database.getDb(requireContext()).toDoDao()
 
         setupTodoListAdapter(binding.todoListRecyclerView)
-//        viewModel.todos.observe(this) {
-//            Log.d("DEBUG", "New List: $it")
-//        }
+        viewModel.todos.observe(this) {
+            if (it.isEmpty()) {
+                binding.noTodoText.visibility = View.VISIBLE
+            } else {
+                binding.noTodoText.visibility = View.GONE
+            }
+        }
 
         return binding.root
     }
