@@ -45,7 +45,7 @@ class AddToDoFragment : Fragment() {
                 findNavController().navigate(R.id.action_addToDoFragment_to_mainFragment)
             }
         }
-
+        setHasOptionsMenu(false)
         return binding.root
     }
 

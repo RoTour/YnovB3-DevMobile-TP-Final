@@ -2,9 +2,7 @@ package codes.routour.rotodo.ui.main
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -47,7 +45,7 @@ class MainFragment : Fragment() {
                 binding.noTodoText.visibility = View.GONE
             }
         }
-
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -90,4 +88,22 @@ class MainFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.options_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d("DEBUG", "Option selected: $item")
+        when(item.itemId) {
+            R.id.themes -> {
+                findNavController().navigate(R.id.action_mainFragment_to_themesFragment)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
 }

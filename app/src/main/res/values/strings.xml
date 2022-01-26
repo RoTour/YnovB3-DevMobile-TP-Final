@@ -5,4 +5,9 @@
     <string name="createTodo_txt">Create your ToDo</string>
     <string name="createTodoHint">Homeworks</string>
     <string name="NoTodo">No todo created yet!</string>
+    <string name="themes">Themes</string>
+    <string name="ro_light_theme">Light Theme</string>
+    <string name="select_your_theme">Select your theme:</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="auto">Auto</string>
 </resources>

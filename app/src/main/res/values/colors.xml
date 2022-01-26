@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--  Light Colors  -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -9,5 +10,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#44d62c</color>
     <color name="primary_dark">#04940c</color>
+    <color name="primary_night">#FF0000</color>
     <color name="bgColor">#282c34</color>
+
+<!--  Dark Colors  -->
+    <color name="primary_darker">#005400</color>
 </resources>

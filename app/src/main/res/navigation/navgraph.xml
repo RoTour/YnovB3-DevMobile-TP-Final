@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_mainFragment_to_addToDoFragment"
             app:destination="@id/addToDoFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_themesFragment"
+            app:destination="@id/themesFragment" />
     </fragment>
     <fragment
         android:id="@+id/addToDoFragment"
@@ -18,6 +21,14 @@
         android:label="AddToDoFragment" >
         <action
             android:id="@+id/action_addToDoFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/themesFragment"
+        android:name="codes.routour.rotodo.ui.main.ThemesFragment"
+        android:label="ThemesFragment" >
+        <action
+            android:id="@+id/action_themesFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
     </fragment>
 </navigation>
